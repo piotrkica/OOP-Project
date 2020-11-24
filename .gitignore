@@ -1,0 +1,4 @@
+# Project exclude paths
+*.class
+*.iml
+/out/
