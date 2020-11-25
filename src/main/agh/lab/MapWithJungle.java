@@ -57,6 +57,27 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         return position.follows(bottomLeftMap) && position.precedes(topRightMap);
     }
 
+    public Vector2d repositionIfOutOfBounds(Vector2d position){
+        if (!canMoveTo(position)){
+            int x = position.x;
+            int y = position.y;
+            if (position.x > topRightMap.x){
+                x = bottomLeftMap.x;
+            }
+            else if (position.x < bottomLeftMap.x){
+                x = topRightMap.x;
+            }
+            if (position.y > topRightMap.y){
+                y = bottomLeftMap.y;
+            }
+            else if (position.y < bottomLeftMap.y){
+                y = topRightMap.y;
+            }
+            position = new Vector2d(x,y);
+        }
+        return position;
+    }
+
     @Override
     public Object objectAt(Vector2d position) {
         if (animalsMM.get(position).size() == 0){
@@ -64,10 +85,10 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         }
         return animalsMM.get(position);
     }
+
     public Multimap<Vector2d, Animal> getAnimalsMM() {
         return animalsMM;
     }
-
 
     @Override
     public void positionChanged(Animal animal, Vector2d oldPosition) {
