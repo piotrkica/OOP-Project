@@ -1,11 +1,11 @@
 package agh.lab;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import static agh.lab.SimulationEngine.grassEnergyValue;
 import static java.lang.Math.*;
 
 public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
@@ -21,10 +21,10 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         this.bottomLeftMap = new Vector2d(0, 0);
         this.topRightMap = new Vector2d(width - 1, height - 1);
 
-        double jungleWidth = floor(width * jungleRatio);
-        double jungleHeight = floor(height * jungleRatio);
-        this.bottomLeftJungle = new Vector2d((int) floor((width - jungleWidth)/2), (int) floor((height - jungleHeight)/2));
-        this.topRightJungle = new Vector2d((int) floor((width + jungleWidth)/2), (int) floor((height + jungleHeight)/2));
+        int jungleWidth = (int) floor(width * jungleRatio);
+        int jungleHeight = (int) floor(height * jungleRatio);
+        this.bottomLeftJungle = new Vector2d( floorDiv(width - jungleWidth, 2), floorDiv(height - jungleHeight, 2));
+        this.topRightJungle = new Vector2d( floorDiv(width + jungleWidth, 2),floorDiv(height + jungleHeight, 2));
         System.out.println(bottomLeftJungle);
         System.out.println(topRightJungle);
 
@@ -106,8 +106,8 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         Vector2d position;
 
         do {
-            position = new Vector2d(rand.nextInt(topRightMap.x - bottomLeftMap.x) + bottomLeftMap.x
-                                    ,rand.nextInt(topRightMap.y - bottomLeftMap.y) + bottomLeftMap.y);
+            position = new Vector2d(rand.nextInt(topRightMap.x - bottomLeftMap.x + 1) + bottomLeftMap.x
+                                    ,rand.nextInt(topRightMap.y - bottomLeftMap.y + 1) + bottomLeftMap.y);
 
         } while (this.isOccupied(position) || isInJungle(position));
 
@@ -118,14 +118,40 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
             return;
         }
         do {
-            position = new Vector2d(rand.nextInt(topRightJungle.x - bottomLeftJungle.x) + bottomLeftJungle.x
-                    ,rand.nextInt(topRightJungle.y - bottomLeftJungle.y) + bottomLeftJungle.y);
+            position = new Vector2d(rand.nextInt(topRightJungle.x - bottomLeftJungle.x + 1) + bottomLeftJungle.x
+                    ,rand.nextInt(topRightJungle.y - bottomLeftJungle.y + 1) + bottomLeftJungle.y);
         } while (this.isOccupied(position));
 
         grassTilesHM.put(position, new Grass(position));
     }
 
+    public List<Animal> getStrongestAnimals(Vector2d position){
+        List<Animal> strongestAnimals = new LinkedList<>();
+        int strongestEnergy = 0;
+        for (Animal animal : animalsMM.get(position)) {
+            strongestEnergy = max(strongestEnergy, animal.getEnergy());
+        }
+        for (Animal animal : animalsMM.get(position)) {
+            if (animal.getEnergy() == strongestEnergy) {
+                strongestAnimals.add(animal);
+            }
+        }
+        return strongestAnimals;
+    }
 
+    public void eatGrass(){
+        Vector2d[] grassTiles = grassTilesHM.keySet().toArray(new Vector2d[0]);
+        for(Vector2d grassPosition : grassTiles){
+            if (animalsMM.get(grassPosition).size() >= 1){
+                grassTilesHM.remove(grassPosition);
+                List<Animal> strongestAnimals = getStrongestAnimals(grassPosition);
+                int grassEnergyValueSplit = floorDiv(grassEnergyValue, strongestAnimals.size());
+                for(Animal animal : strongestAnimals){
+                    animal.addEnergy(grassEnergyValueSplit);
+                }
+            }
+        }
+    }
 
 
 }
