@@ -6,6 +6,9 @@ public class SimulationEngine implements IEngine {
     private final MoveDirection[] directions;
     private final MapWithJungle map;
     private final int animalsNo;
+    public static int startingEnergy = 10;
+    public static int grassEnergyValue = 5;
+
 
     public SimulationEngine(MoveDirection[] directions, MapWithJungle map, Vector2d[] startingPosition) {
         this.directions = directions;
@@ -20,8 +23,12 @@ public class SimulationEngine implements IEngine {
         Collection<Animal> animalCollection = map.getAnimalsMM().values();
         Animal[] animals = new Animal[animalCollection.size()];
         animals = animalCollection.toArray(animals);
-        for (int i = 0; i < directions.length; i++) {
-            animals[i % animalsNo].move(directions[i]);
+        for (int i = 0; i < directions.length;) {
+            for (int j = 0; j < animalsNo && i < directions.length; j++){
+                animals[i % animalsNo].move(directions[i]);
+                i++;
+            }
+            this.map.eatGrass();
         }
 
     }
