@@ -3,11 +3,14 @@ package agh.lab;
 import java.util.ArrayList;
 import java.util.List;
 
+import static agh.lab.SimulationEngine.startingEnergy;
+
 public class Animal implements IMapElement {
-    private MapDirection orientation = MapDirection.NORTH;
-    private Vector2d position;
     private final MapWithJungle map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
+    private MapDirection orientation = MapDirection.NORTH;
+    private Vector2d position;
+    private int energy = startingEnergy;
 
     public Animal(MapWithJungle map) {
         this.map = map;
@@ -52,6 +55,7 @@ public class Animal implements IMapElement {
 
     public void move(MoveDirection direction) {
         Vector2d oldPosition = position;
+        energy--;
         switch (direction) {
             case RIGHT:
                 this.orientation = this.orientation.next();
@@ -68,7 +72,6 @@ public class Animal implements IMapElement {
                 Vector2d newPosition = this.position.add(movement);
 
                 this.position = this.map.repositionIfOutOfBounds(newPosition);
-                System.out.println(this.position);
                 positionChanged(oldPosition);
                 break;
         }
@@ -88,4 +91,11 @@ public class Animal implements IMapElement {
         }
     }
 
+    public int getEnergy(){
+        return this.energy;
+    }
+
+    public void addEnergy(int grassEnergyValueSplit) {
+        this.energy += grassEnergyValueSplit;
+    }
 }
