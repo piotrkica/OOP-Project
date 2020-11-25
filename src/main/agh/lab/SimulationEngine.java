@@ -1,11 +1,13 @@
 package agh.lab;
 
+import java.util.Collection;
+
 public class SimulationEngine implements IEngine {
     private final MoveDirection[] directions;
-    private final IWorldMap map;
+    private final MapWithJungle map;
     private final Vector2d[] animalPositions;
 
-    public SimulationEngine(MoveDirection[] directions, IWorldMap map, Vector2d[] startingPosition) {
+    public SimulationEngine(MoveDirection[] directions, MapWithJungle map, Vector2d[] startingPosition) {
         this.directions = directions;
         this.map = map;
         this.animalPositions = startingPosition;
@@ -15,11 +17,12 @@ public class SimulationEngine implements IEngine {
     }
 
     public void run() {
-        int n = animalPositions.length;
+        Collection<Animal> animalCollection = map.getAnimalsMM().values();
+        Animal[] animals = new Animal[animalCollection.size()];
+        animals = animalCollection.toArray(animals);
         for (int i = 0; i < directions.length; i++) {
-            Animal movedAnimal = (Animal) this.map.objectAt(animalPositions[i % n]);
-            movedAnimal.move(directions[i]);
-            this.animalPositions[i % n] = movedAnimal.getPosition();
+            animals[i % animalPositions.length].move(directions[i]);
         }
+
     }
 }
