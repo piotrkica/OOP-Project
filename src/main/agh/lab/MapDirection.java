@@ -2,20 +2,32 @@ package agh.lab;
 
 public enum MapDirection {
     NORTH,
+    NORTHEAST,
     EAST,
+    SOUTHEAST,
     SOUTH,
-    WEST;
+    SOUTHWEST,
+    WEST,
+    NORTHWEST;
 
     public String toString() {
         switch (this) {
             case NORTH:
                 return "Północ";
-            case SOUTH:
-                return "Południe";
-            case WEST:
-                return "Zachód";
+            case NORTHEAST:
+                return "Północny wschód";
             case EAST:
                 return "Wschód";
+            case SOUTHEAST:
+                return "Południowy wschód";
+            case SOUTH:
+                return "Południe";
+            case SOUTHWEST:
+                return "Południowy zachód";
+            case WEST:
+                return "Zachód";
+            case NORTHWEST:
+                return "Północny zachód";
             default:
                 return null; // Nie zdarzy sie
         }
@@ -24,13 +36,21 @@ public enum MapDirection {
     public MapDirection next() {
         switch (this) {
             case NORTH:
+                return NORTHEAST;
+            case NORTHEAST:
                 return EAST;
+            case EAST:
+                return SOUTHEAST;
+            case SOUTHEAST:
+                return SOUTH;
             case SOUTH:
+                return SOUTHWEST;
+            case SOUTHWEST:
                 return WEST;
             case WEST:
+                return NORTHWEST;
+            case NORTHWEST:
                 return NORTH;
-            case EAST:
-                return SOUTH;
             default:
                 return null;
         }
@@ -39,13 +59,21 @@ public enum MapDirection {
     public MapDirection previous() {
         switch (this) {
             case NORTH:
-                return WEST;
-            case SOUTH:
-                return EAST;
-            case WEST:
-                return SOUTH;
-            case EAST:
+                return NORTHWEST;
+            case NORTHEAST:
                 return NORTH;
+            case EAST:
+                return NORTHEAST;
+            case SOUTHEAST:
+                return EAST;
+            case SOUTH:
+                return SOUTHEAST;
+            case SOUTHWEST:
+                return SOUTH;
+            case WEST:
+                return SOUTHWEST;
+            case NORTHWEST:
+                return WEST;
             default:
                 return null;
         }
@@ -55,12 +83,20 @@ public enum MapDirection {
         switch (this) {
             case NORTH:
                 return new Vector2d(0, 1);
-            case SOUTH:
-                return new Vector2d(0, -1);
-            case WEST:
-                return new Vector2d(-1, 0);
+            case NORTHEAST:
+                return new Vector2d(1, 1);
             case EAST:
                 return new Vector2d(1, 0);
+            case SOUTHEAST:
+                return new Vector2d(1, -1);
+            case SOUTH:
+                return new Vector2d(0, -1);
+            case SOUTHWEST:
+                return new Vector2d(-1, -1);
+            case WEST:
+                return new Vector2d(-1, 0);
+            case NORTHWEST:
+                return new Vector2d(-1, 1);
             default:
                 return null;
         }
