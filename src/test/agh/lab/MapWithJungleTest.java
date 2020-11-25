@@ -1,11 +1,11 @@
-package agh.lab;
+/*package agh.lab;
 
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class RectangularMapTest {
-    private final IWorldMap map = new RectangularMap(11, 6);
+public class MapWithJungleTest {
+    private final IWorldMap map = new MapWithJungle(11, 6, 0, 0);
 
     @Test
     public void testCanMoveTo() {
@@ -13,9 +13,6 @@ public class RectangularMapTest {
         assertFalse(map.canMoveTo(new Vector2d(11, 2)));
         assertFalse(map.canMoveTo(new Vector2d(2, 6)));
         assertTrue(map.canMoveTo(new Vector2d(2, 2)));
-
-        map.place(new Animal(map, new Vector2d(4, 4)));
-        assertFalse(map.canMoveTo(new Vector2d(4, 4)));
     }
 
     @Test
@@ -23,7 +20,7 @@ public class RectangularMapTest {
         Animal wombat = new Animal(map, new Vector2d(3,4));
         Animal lemur = new Animal(map, new Vector2d(3,4));
         map.place(wombat);
-        assertThrows(IllegalArgumentException.class, () -> map.place(lemur));
+        map.place(lemur);
         assertNotEquals(lemur, map.objectAt(new Vector2d(3,4)));
         assertTrue(map.place(new Animal(map, new Vector2d(4, 4))));
     }
@@ -45,3 +42,4 @@ public class RectangularMapTest {
         assertEquals(animal, map.objectAt(new Vector2d(2, 2)));
     }
 }
+*/

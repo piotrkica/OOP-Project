@@ -1,11 +1,11 @@
-package agh.lab;
+/*package agh.lab;
 
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class OptionsParserTest {
-    private final IWorldMap map = new RectangularMap(5, 5);
+    private final IWorldMap map = new MapWithJungle(5, 5, 0, 0);
     private final Animal wombat = new Animal(map);
     private final OptionsParser parser = new OptionsParser();
     private final String[] dirs = {"f", "b", "f", "f", "r", "f", "f", "r", "l", "r"};
@@ -22,3 +22,4 @@ public class OptionsParserTest {
         assertThrows(IllegalArgumentException.class, () -> parser.parse(wrongDirs));
     }
 }
+*/
