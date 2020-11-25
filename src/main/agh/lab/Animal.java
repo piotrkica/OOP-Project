@@ -6,15 +6,15 @@ import java.util.List;
 public class Animal implements IMapElement {
     private MapDirection orientation = MapDirection.NORTH;
     private Vector2d position;
-    private final IWorldMap map;
+    private final MapWithJungle map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
 
-    public Animal(IWorldMap map) {
+    public Animal(MapWithJungle map) {
         this.map = map;
         this.position = new Vector2d(2, 2);
     }
 
-    public Animal(IWorldMap map, Vector2d initialPosition) {
+    public Animal(MapWithJungle map, Vector2d initialPosition) {
         this.map = map;
         this.position = initialPosition;
     }
@@ -23,12 +23,20 @@ public class Animal implements IMapElement {
         switch (this.orientation) {
             case NORTH:
                 return "N";
+            case NORTHEAST:
+                return "NE";
             case EAST:
                 return "E";
+            case SOUTHEAST:
+                return "SE";
             case SOUTH:
                 return "S";
+            case SOUTHWEST:
+                return "SW";
             case WEST:
                 return "W";
+            case NORTHWEST:
+                return "NW";
             default:
                 return null;
         }
@@ -59,10 +67,9 @@ public class Animal implements IMapElement {
                 }
                 Vector2d newPosition = this.position.add(movement);
 
-                if (this.map.canMoveTo(newPosition)) {
-                    this.position = newPosition;
-                    positionChanged(oldPosition);
-                }
+                this.position = this.map.repositionIfOutOfBounds(newPosition);
+                System.out.println(this.position);
+                positionChanged(oldPosition);
                 break;
         }
     }
