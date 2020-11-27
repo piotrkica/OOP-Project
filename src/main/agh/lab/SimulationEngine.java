@@ -19,7 +19,6 @@ public class SimulationEngine implements IEngine {
             Collection<Animal> animalCollection = map.getAnimalsMM().values();
             Animal[] animals = new Animal[animalCollection.size()];
             animals = animalCollection.toArray(animals);
-            int n = animals.length;
 
             System.out.println(map);
 

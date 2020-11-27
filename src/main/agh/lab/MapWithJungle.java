@@ -1,11 +1,8 @@
 package agh.lab;
 
 import java.util.*;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.ArrayList;
-import java.util.List;
 
 import static agh.lab.SimulationEngine.grassEnergyValue;
 import static agh.lab.SimulationEngine.startingEnergy;
@@ -28,10 +25,12 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
 
         int jungleWidth = (int) floor(width * jungleRatio);
         int jungleHeight = (int) floor(height * jungleRatio);
-        this.bottomLeftJungle = new Vector2d( floorDiv(width - jungleWidth, 2), floorDiv(height - jungleHeight, 2));
-        this.topRightJungle = new Vector2d( floorDiv(width + jungleWidth, 2),floorDiv(height + jungleHeight, 2));
+        this.bottomLeftJungle = new Vector2d( (width - jungleWidth)/2, (height - jungleHeight)/2);
+        this.topRightJungle = new Vector2d( (width + jungleWidth)/2, (height + jungleHeight)/2);
+
         System.out.println(bottomLeftJungle);
         System.out.println(topRightJungle);
+
         placeStartingAnimals(animalsNo);
         for(int i = 0; i < floorDiv(grassTilesStartNo, 2); i++){
             placeGrassInJungle();
@@ -137,13 +136,6 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
     public void placeGrassInJungle(){
         Vector2d position;
         position = findFreeTile(bottomLeftJungle, topRightJungle);
-        //if (topRightJungle.equals(bottomLeftJungle)){ // edge case if jungle is one tile only
-        //    if (objectAt(topRightJungle) == null){
-        //        grassTilesHM.put(position, new Grass(position));
-        //        return;
-        //    }
-        //    return;
-        //}
         grassTilesHM.put(position, new Grass(position));
     }
 
@@ -203,30 +195,6 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         return parentsPosition;
     }
 
-    public List<Integer> passGenes(Animal strongerAnimal, Animal weakerAnimal){
-        List<Integer> newGenes = new ArrayList<>(strongerAnimal.getGenes());
-        List<Integer> weakerGenes = new ArrayList<>(weakerAnimal.getGenes());
-        Random rand = new Random();
-        int firstCut = rand.nextInt(31) + 1;
-        int secondCut = rand.nextInt(31) + 1;
-        while (secondCut == firstCut){
-            firstCut = rand.nextInt(32);
-        }
-        if (firstCut > secondCut){
-            int tmp = firstCut;
-            firstCut = secondCut;
-            secondCut = tmp;
-        }
-        for (int i = firstCut; i < secondCut; i++){
-            newGenes.set(i, weakerGenes.get(i));
-        }
-        System.out.println("cuts:" + firstCut + " " + secondCut);
-        System.out.println(strongerAnimal.getGenes());
-        System.out.println(weakerAnimal.getGenes());
-        System.out.println(newGenes);
-        return newGenes;
-    }
-
     public void reproduceIfPossible(){
         Vector2d[] animalPositions = animalsMM.keySet().toArray(new Vector2d[0]); //animalsMM.keySet().size()
         for (Vector2d position : animalPositions){
@@ -254,12 +222,12 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
                         strongest2 = animal;
                     }
                 }
-                if (strongest1.getEnergy() > floorDiv(startingEnergy, 2) && strongest2.getEnergy() > floorDiv(startingEnergy, 2)){
-                    int childEnergy = floorDiv(strongest1.getEnergy(),2) + floorDiv(strongest2.getEnergy(),2);
-                    strongest1.setEnergy(floorDiv(strongest1.getEnergy(),2));
-                    strongest2.setEnergy(floorDiv(strongest2.getEnergy(),2));
+                if (strongest1.getEnergy() > startingEnergy/2 && strongest2.getEnergy() > startingEnergy/2){
+                    int childEnergy = strongest1.getEnergy()/2 + strongest2.getEnergy()/2;
+                    strongest1.setEnergy(strongest1.getEnergy()/2);
+                    strongest2.setEnergy(strongest2.getEnergy()/2);
                     strongest1.increaseChildNo();
-                    place(new Animal(this, findFreePositionForChild(position), passGenes(strongest1,strongest2), childEnergy)); // modify Animal class to pass energy from parent
+                    place(new Animal(this, findFreePositionForChild(position), strongest1.getGenes(),strongest2.getGenes(), childEnergy));
                 }
             }
         }
