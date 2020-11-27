@@ -4,8 +4,11 @@ import java.util.*;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
+import java.util.List;
 
 import static agh.lab.SimulationEngine.grassEnergyValue;
+import static agh.lab.SimulationEngine.startingEnergy;
 import static java.lang.Math.*;
 
 public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
@@ -16,8 +19,10 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
     private final Vector2d topRightJungle;
     private final Multimap<Vector2d, Animal> animalsMM = ArrayListMultimap.create();
     private final Map<Vector2d, Grass> grassTilesHM = new HashMap<>();
+    private final List<Animal> deadAnimals = new ArrayList<>();
+    private final Random rand = new Random();
 
-    public MapWithJungle(int width, int height, double jungleRatio, int grassTilesStartNo) {
+    public MapWithJungle(int width, int height, double jungleRatio, int grassTilesStartNo, int animalsNo) {
         this.bottomLeftMap = new Vector2d(0, 0);
         this.topRightMap = new Vector2d(width - 1, height - 1);
 
@@ -27,9 +32,12 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         this.topRightJungle = new Vector2d( floorDiv(width + jungleWidth, 2),floorDiv(height + jungleHeight, 2));
         System.out.println(bottomLeftJungle);
         System.out.println(topRightJungle);
-
-        for(int i = 0; i < grassTilesStartNo; i++){
-            placeGrassInJungleAndOutside();
+        placeStartingAnimals(animalsNo);
+        for(int i = 0; i < floorDiv(grassTilesStartNo, 2); i++){
+            placeGrassInJungle();
+        }
+        for(int i = 0; i < ceil(grassTilesStartNo/2.0); i++){
+            placeGrassOutsideJungle();
         }
     }
 
@@ -45,11 +53,27 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
     @Override
     public boolean place(Animal animal) {
         if (!canMoveTo(animal.getPosition())) {
-            throw new IllegalArgumentException(animal.getPosition() + " field is occupied");
+            throw new IllegalArgumentException(animal.getPosition() + " field is out of bounds");
         }
         animalsMM.put(animal.getPosition(), animal);
         animal.addObserver(this);
         return true;
+    }
+
+    public void placeStartingAnimals(int animalsNo){
+        for (int i = 0; i < animalsNo; i++){
+            Vector2d position = findFreeTile(bottomLeftMap,topRightMap);
+            place(new Animal(this, position));
+        }
+    }
+
+    public Vector2d findFreeTile(Vector2d bottomLeft, Vector2d topRight){// potrzebny fix by się nie zapętlił jak nie ma wolnych miejsc
+        Vector2d position;
+        do{
+            position = new Vector2d(rand.nextInt(topRight.x - bottomLeft.x + 1) + bottomLeft.x
+                    ,rand.nextInt(topRight.y - bottomLeft.y + 1) + bottomLeft.y);
+        } while (this.isOccupied(position));
+        return position;
     }
 
     @Override
@@ -101,27 +125,25 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         return position.follows(bottomLeftJungle) && position.precedes(topRightJungle);
     }
 
-    public void placeGrassInJungleAndOutside(){ // potrzebny fix by się nie zapętlił jak nie ma wolnych miejsc
-        Random rand = new Random();
+    public void placeGrassOutsideJungle(){
         Vector2d position;
-
         do {
-            position = new Vector2d(rand.nextInt(topRightMap.x - bottomLeftMap.x + 1) + bottomLeftMap.x
-                                    ,rand.nextInt(topRightMap.y - bottomLeftMap.y + 1) + bottomLeftMap.y);
-
-        } while (this.isOccupied(position) || isInJungle(position));
+            position = findFreeTile(bottomLeftMap,topRightMap);
+        } while(isInJungle(position));
 
         grassTilesHM.put(position, new Grass(position));
+    }
 
-        if (topRightJungle.equals(bottomLeftJungle) && objectAt(topRightJungle) == null){
-            grassTilesHM.put(position, new Grass(position));
-            return;
-        }
-        do {
-            position = new Vector2d(rand.nextInt(topRightJungle.x - bottomLeftJungle.x + 1) + bottomLeftJungle.x
-                    ,rand.nextInt(topRightJungle.y - bottomLeftJungle.y + 1) + bottomLeftJungle.y);
-        } while (this.isOccupied(position));
-
+    public void placeGrassInJungle(){
+        Vector2d position;
+        position = findFreeTile(bottomLeftJungle, topRightJungle);
+        //if (topRightJungle.equals(bottomLeftJungle)){ // edge case if jungle is one tile only
+        //    if (objectAt(topRightJungle) == null){
+        //        grassTilesHM.put(position, new Grass(position));
+        //        return;
+        //    }
+        //    return;
+        //}
         grassTilesHM.put(position, new Grass(position));
     }
 
@@ -153,5 +175,93 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         }
     }
 
+    public void removeDead() {
+        Collection<Animal> animalCollection = animalsMM.values();
+        Animal[] animals = new Animal[animalCollection.size()];
+        animals = animalCollection.toArray(animals);
 
+        for(Animal animal : animals){
+            if(animal.getEnergy() <= 0){
+                deadAnimals.add(animal);
+                animal.removeAllObservers();
+                animalsMM.remove(animal.getPosition(), animal);
+            }
+        }
+    }
+
+    public Vector2d findFreePositionForChild(Vector2d parentsPosition){ // na obecną chwile przeszukuje w promieniu 2 pól, może znaleźć miejsc po drugiej stronie mapy
+        for(int r = 1; r < 2; r++){
+            for(int i = -r; i < r; i++){
+                for(int j = -r; j < r; j++){
+                    Vector2d possiblePosition = repositionIfOutOfBounds(new Vector2d(i, j));
+                    if (!isOccupied(possiblePosition)){
+                        return possiblePosition;
+                    }
+                }
+            }
+        }
+        return parentsPosition;
+    }
+
+    public List<Integer> passGenes(Animal strongerAnimal, Animal weakerAnimal){
+        List<Integer> newGenes = new ArrayList<>(strongerAnimal.getGenes());
+        List<Integer> weakerGenes = new ArrayList<>(weakerAnimal.getGenes());
+        Random rand = new Random();
+        int firstCut = rand.nextInt(31) + 1;
+        int secondCut = rand.nextInt(31) + 1;
+        while (secondCut == firstCut){
+            firstCut = rand.nextInt(32);
+        }
+        if (firstCut > secondCut){
+            int tmp = firstCut;
+            firstCut = secondCut;
+            secondCut = tmp;
+        }
+        for (int i = firstCut; i < secondCut; i++){
+            newGenes.set(i, weakerGenes.get(i));
+        }
+        System.out.println("cuts:" + firstCut + " " + secondCut);
+        System.out.println(strongerAnimal.getGenes());
+        System.out.println(weakerAnimal.getGenes());
+        System.out.println(newGenes);
+        return newGenes;
+    }
+
+    public void reproduceIfPossible(){
+        Vector2d[] animalPositions = animalsMM.keySet().toArray(new Vector2d[0]); //animalsMM.keySet().size()
+        for (Vector2d position : animalPositions){
+            if (animalsMM.get(position).size() >= 2){
+                Animal strongest1 = null;
+                Animal strongest2 = null;
+                for (Animal animal : animalsMM.get(position)){
+                    if (strongest1 == null){
+                        strongest1 = animal;
+                    }
+                    else if (strongest2 == null){
+                        if (strongest1.getEnergy() > animal.getEnergy()){
+                            strongest2 = animal;
+                        }
+                        else{
+                            strongest2 = strongest1;
+                            strongest1 = animal;
+                        }
+                    }
+                    else if (strongest1.getEnergy() < animal.getEnergy()){
+                        strongest2 = strongest1;
+                        strongest1 = animal;
+                    }
+                    else if (strongest2.getEnergy() < animal.getEnergy()){
+                        strongest2 = animal;
+                    }
+                }
+                if (strongest1.getEnergy() > floorDiv(startingEnergy, 2) && strongest2.getEnergy() > floorDiv(startingEnergy, 2)){
+                    int childEnergy = floorDiv(strongest1.getEnergy(),2) + floorDiv(strongest2.getEnergy(),2);
+                    strongest1.setEnergy(floorDiv(strongest1.getEnergy(),2));
+                    strongest2.setEnergy(floorDiv(strongest2.getEnergy(),2));
+                    strongest1.increaseChildNo();
+                    place(new Animal(this, findFreePositionForChild(position), passGenes(strongest1,strongest2), childEnergy)); // modify Animal class to pass energy from parent
+                }
+            }
+        }
+    }
 }
