@@ -61,7 +61,6 @@ public class Genes {
         for (int i = 0; i < 8;i++){
             if (genesSum[i] == 0){
                 int geneToSubstitute = moreThan2Genes.get(rand.nextInt(moreThan2Genes.size()));
-                System.out.println("genpodmiany:"+geneToSubstitute);
                 this.genesSum[geneToSubstitute]-=1;
                 if (this.genesSum[geneToSubstitute] == 1){
                     moreThan2Genes.remove(geneToSubstitute);
