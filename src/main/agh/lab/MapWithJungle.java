@@ -112,17 +112,15 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
     }
 
     public Vector2d findFreePositionForChild(Vector2d parentsPosition){ // na obecną chwile przeszukuje w promieniu 2 pól, może znaleźć miejsc po drugiej stronie mapy
-        for(int r = 1; r < 2; r++){
-            for(int i = -r; i < r; i++){
-                for(int j = -r; j < r; j++){
-                    Vector2d possiblePosition = repositionIfOutOfBounds(new Vector2d(i, j));
-                    if (!isOccupied(possiblePosition)){
-                        return possiblePosition;
-                    }
+        for(int i = -1; i < 1; i++){
+            for(int j = -1; j < 1; j++){
+                Vector2d possiblePosition = repositionIfOutOfBounds(new Vector2d(i, j));
+                if (!isOccupied(possiblePosition)){
+                    return possiblePosition;
                 }
             }
         }
-        return parentsPosition;
+        return new Vector2d(rand.nextInt(3)+parentsPosition.x - 1, rand.nextInt(3)+parentsPosition.y - 1);
     }
 
     public Vector2d repositionIfOutOfBounds(Vector2d position){
