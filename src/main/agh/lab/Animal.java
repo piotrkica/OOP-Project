@@ -1,25 +1,44 @@
 package agh.lab;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
 
 import static agh.lab.SimulationEngine.startingEnergy;
+import static agh.lab.MapDirection.MAP_DIRS_INDEXED;
 
 public class Animal implements IMapElement {
     private final MapWithJungle map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
     private MapDirection orientation = MapDirection.NORTH;
     private Vector2d position;
-    private int energy = startingEnergy;
-
-    public Animal(MapWithJungle map) {
-        this.map = map;
-        this.position = new Vector2d(2, 2);
-    }
+    private int energy;
+    private int daysAlive = 0;
+    private int childrenNo = 0;
+    private List<Integer> genes = new ArrayList<>();
+    private final int[] genesSum = new int[8];
+    private final Random rand = new Random();
 
     public Animal(MapWithJungle map, Vector2d initialPosition) {
         this.map = map;
         this.position = initialPosition;
+        this.energy = startingEnergy;
+        for (int i = 0; i < 32; i++){
+            int gene = rand.nextInt(8);
+            genes.add(gene);
+            genesSum[gene]++;
+        }
+        addMissingMovesAndSort();
+    }
+
+    public Animal(MapWithJungle map, Vector2d initialPosition, List<Integer> initialGenes, int energy) {
+        this.map = map;
+        this.position = initialPosition;
+        this.genes = initialGenes;
+        for (Integer gene : genes){
+            genesSum[gene]++;
+        }
+        addMissingMovesAndSort();
+        this.energy = energy;
     }
 
     public String toString() {
@@ -45,6 +64,33 @@ public class Animal implements IMapElement {
         }
     }
 
+    private void addMissingMovesAndSort(){ // to check if all moves are available
+        List<Integer> moreThan2Genes = new ArrayList<>();
+        for (int i = 0; i < 8;i++){
+            if (genesSum[i] >= 2){
+                moreThan2Genes.add(i);
+            }
+        }
+        //System.out.println("moreThan2Genes:"+moreThan2Genes.size());
+        //System.out.println("genesSum:"+genesSum.length);
+
+        for (int i = 0; i < 8;i++){
+            if (genesSum[i] == 0){
+                //System.out.println("missingGene:"+i);
+                //System.out.println(genes);
+
+                int geneToSubstitute = moreThan2Genes.get(rand.nextInt(moreThan2Genes.size()));
+                System.out.println("genpodmiany:"+geneToSubstitute);
+                this.genesSum[geneToSubstitute]-=1;
+                if (this.genesSum[geneToSubstitute] == 1){
+                    moreThan2Genes.remove(geneToSubstitute);
+                }
+                genes.set(genes.indexOf(geneToSubstitute), i);
+            }
+        }
+        Collections.sort(genes);
+    }
+
     public Vector2d getPosition() {
         return this.position;
     }
@@ -53,28 +99,21 @@ public class Animal implements IMapElement {
         return this.orientation;
     }
 
-    public void move(MoveDirection direction) {
+    public MapDirection chooseNextMove(){
+        int moveDir = genes.get(rand.nextInt(32));
+        return MAP_DIRS_INDEXED[moveDir];
+    }
+
+    public void move() {
         Vector2d oldPosition = position;
         energy--;
-        switch (direction) {
-            case RIGHT:
-                this.orientation = this.orientation.next();
-                break;
-            case LEFT:
-                this.orientation = this.orientation.previous();
-                break;
-            case BACKWARD:
-            case FORWARD:
-                Vector2d movement = this.orientation.toUnitVector();
-                if (direction == MoveDirection.BACKWARD) {
-                    movement = movement.opposite();
-                }
-                Vector2d newPosition = this.position.add(movement);
+        daysAlive++;
+        MapDirection direction = chooseNextMove();
+        Vector2d newPosition = this.position.add(direction.toUnitVector());
+        this.position = this.map.repositionIfOutOfBounds(newPosition);
+        positionChanged(oldPosition);
+        this.orientation = direction;
 
-                this.position = this.map.repositionIfOutOfBounds(newPosition);
-                positionChanged(oldPosition);
-                break;
-        }
     }
 
     public void addObserver(IPositionChangeObserver observer) {
@@ -83,6 +122,12 @@ public class Animal implements IMapElement {
 
     public void removeObserver(IPositionChangeObserver observer) {
         observers.remove(observer);
+    }
+
+    public void removeAllObservers() {
+        for (IPositionChangeObserver observer : new ArrayList<>(observers)) {
+            observers.remove(observer);
+        }
     }
 
     public void positionChanged(Vector2d oldPosition) {
@@ -98,4 +143,17 @@ public class Animal implements IMapElement {
     public void addEnergy(int grassEnergyValueSplit) {
         this.energy += grassEnergyValueSplit;
     }
+
+    public void setEnergy(int energy){
+        this.energy = energy;
+    }
+
+    public void increaseChildNo(){
+        this.childrenNo++;
+    }
+
+    public List<Integer> getGenes(){
+        return this.genes;
+    }
+
 }
