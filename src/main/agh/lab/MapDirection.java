@@ -10,6 +10,8 @@ public enum MapDirection {
     WEST,
     NORTHWEST;
 
+    public static MapDirection[] MAP_DIRS_INDEXED = new MapDirection[] {NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST};
+
     public String toString() {
         switch (this) {
             case NORTH:
