@@ -3,33 +3,38 @@ package agh.lab;
 import java.util.Collection;
 
 public class SimulationEngine implements IEngine {
-    private final MoveDirection[] directions;
+    private final int days;
     private final MapWithJungle map;
-    private final int animalsNo;
-    public static int startingEnergy = 10;
-    public static int grassEnergyValue = 5;
+    public static int startingEnergy = 15;
+    public static int grassEnergyValue = 10;
 
 
-    public SimulationEngine(MoveDirection[] directions, MapWithJungle map, Vector2d[] startingPosition) {
-        this.directions = directions;
+    public SimulationEngine(int days, MapWithJungle map) {
+        this.days = days;
         this.map = map;
-        this.animalsNo = startingPosition.length;
-        for (Vector2d position : startingPosition) {
-            map.place(new Animal(map, position));
-        }
     }
 
     public void run() {
-        Collection<Animal> animalCollection = map.getAnimalsMM().values();
-        Animal[] animals = new Animal[animalCollection.size()];
-        animals = animalCollection.toArray(animals);
-        for (int i = 0; i < directions.length;) {
-            for (int j = 0; j < animalsNo && i < directions.length; j++){
-                animals[i % animalsNo].move(directions[i]);
-                i++;
+        for (int i = 0; i < days;i++) {
+            Collection<Animal> animalCollection = map.getAnimalsMM().values();
+            Animal[] animals = new Animal[animalCollection.size()];
+            animals = animalCollection.toArray(animals);
+            int n = animals.length;
+
+            System.out.println(map);
+
+            this.map.removeDead();
+            for (Animal animal : animals) {
+                animal.move();
             }
             this.map.eatGrass();
+            this.map.reproduceIfPossible();
+            this.map.placeGrassInJungle();
+            this.map.placeGrassOutsideJungle();
+            for (Animal animal : animals) {
+                System.out.println(animal.getEnergy());
+            }
         }
-
+        System.out.println(map);
     }
 }
