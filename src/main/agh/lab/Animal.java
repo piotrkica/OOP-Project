@@ -2,8 +2,6 @@ package agh.lab;
 
 import java.util.*;
 
-import static agh.lab.SimulationEngine.startingEnergy;
-
 public class Animal implements IMapElement {
     private final MapWithJungle map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
@@ -11,10 +9,10 @@ public class Animal implements IMapElement {
     private Vector2d position;
     private int energy;
     private int daysAlive = 0;
-    private int childrenNo = 0;
+    private int childrenCount = 0;
     private final Genes genes;
 
-    public Animal(MapWithJungle map, Vector2d initialPosition) {
+    public Animal(MapWithJungle map, Vector2d initialPosition, int startingEnergy) {
         this.map = map;
         this.position = initialPosition;
         this.energy = startingEnergy;
@@ -59,9 +57,9 @@ public class Animal implements IMapElement {
         return this.orientation;
     }
 
-    public void move() {
+    public void move(int moveEnergyCost) {
         Vector2d oldPosition = position;
-        energy--;
+        this.energy-= moveEnergyCost;
         daysAlive++;
         MapDirection direction = genes.chooseNextMove();
         Vector2d newPosition = this.position.add(direction.toUnitVector());
@@ -73,10 +71,6 @@ public class Animal implements IMapElement {
 
     public void addObserver(IPositionChangeObserver observer) {
         observers.add(observer);
-    }
-
-    public void removeObserver(IPositionChangeObserver observer) {
-        observers.remove(observer);
     }
 
     public void removeAllObservers() {
@@ -103,8 +97,8 @@ public class Animal implements IMapElement {
         this.energy = energy;
     }
 
-    public void increaseChildNo(){
-        this.childrenNo++;
+    public void increaseChildrenCount(){
+        this.childrenCount++;
     }
 
     public List<Integer> getGenes(){
