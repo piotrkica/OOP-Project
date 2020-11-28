@@ -4,31 +4,55 @@ import com.google.common.collect.Multimap;
 
 import java.util.*;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 
 public class SimulationEngine implements IEngine {
-    private final int days;
+    private int days = 0;
     private final MapWithJungle map;
-    public static int startingEnergy = 15;
-    public static int grassEnergyValue = 10;
+    public int startingEnergy;
+    public int grassEnergyValue;
+    public int moveEnergyCost;
     private final List<Animal> deadAnimals = new ArrayList<>();
 
-
-    public SimulationEngine(int days, MapWithJungle map) {
-        this.days = days;
-        this.map = map;
+    public SimulationEngine(int width, int height, float jungleRatio, int startingAnimals, int startingGrassTiles, int startingEnergy, int grassEnergyValue, int moveEnergyCost) {
+        this.map = new MapWithJungle(width, height, jungleRatio);
+        this.startingEnergy = startingEnergy;
+        this.grassEnergyValue = grassEnergyValue;
+        this.moveEnergyCost = moveEnergyCost;
+        placeStartingAnimals(startingAnimals);
+        placeStartingGrass(startingGrassTiles);
     }
 
     public void run() {
-        for (int i = 0; i < days;i++) {
+        for (int i = 0; i < 6;i++) {
+            this.days++;
+            System.out.println("Day: "+ this.days);
             System.out.println(map);
-            removeDead();
+            removeDeadAnimals();
             moveAnimals();
             eatGrass();
             reproduceIfPossible();
             placeGrassInJungleAndOutside();
         }
+
         System.out.println(map);
+    }
+
+    public void placeStartingAnimals(int animalsNo){
+        for (int i = 0; i < animalsNo; i++){
+            Vector2d position = this.map.findFreeTile(this.map.getBottomLeft(),this.map.getTopRight());
+            this.map.place(new Animal(this.map, position, startingEnergy));
+        }
+    }
+
+    public void placeStartingGrass(int startingGrassTiles){
+        for(int i = 0; i < startingGrassTiles/2; i++){
+            this.map.placeGrassInJungle();
+        }
+        for(int i = 0; i < ceil(startingGrassTiles/2.0); i++){
+            this.map.placeGrassOutsideJungle();
+        }
     }
 
     public void moveAnimals(){
@@ -36,7 +60,7 @@ public class SimulationEngine implements IEngine {
         Animal[] animals = new Animal[animalCollection.size()];
         animals = animalCollection.toArray(animals);
         for (Animal animal : animals) {
-            animal.move();
+            animal.move(moveEnergyCost);
         }
         for (Animal animal : animals) {
             System.out.println(animal.getEnergy());
@@ -80,7 +104,7 @@ public class SimulationEngine implements IEngine {
         }
     }
 
-    public void removeDead() {
+    public void removeDeadAnimals() {
         Multimap<Vector2d, Animal> animalsMM = map.getAnimalsMM();
         Collection<Animal> animalCollection = animalsMM.values();
         Animal[] animals = new Animal[animalCollection.size()];
@@ -128,7 +152,7 @@ public class SimulationEngine implements IEngine {
                     int childEnergy = strongest1.getEnergy()/2 + strongest2.getEnergy()/2;
                     strongest1.setEnergy(strongest1.getEnergy()/2);
                     strongest2.setEnergy(strongest2.getEnergy()/2);
-                    strongest1.increaseChildNo();
+                    strongest1.increaseChildrenCount();
                     map.place(new Animal(this.map, this.map.findFreePositionForChild(position), strongest1.getGenes(),strongest2.getGenes(), childEnergy));
                 }
             }

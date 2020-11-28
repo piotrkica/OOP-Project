@@ -8,37 +8,28 @@ import static java.lang.Math.*;
 
 public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
     private final MapVisualizer mapVis = new MapVisualizer(this);
-    private final Vector2d bottomLeftMap;
-    private final Vector2d topRightMap;
+    private final Vector2d bottomLeft;
+    private final Vector2d topRight;
     private final Vector2d bottomLeftJungle;
     private final Vector2d topRightJungle;
     private final Multimap<Vector2d, Animal> animalsMM = ArrayListMultimap.create();
     private final Map<Vector2d, Grass> grassTilesHM = new HashMap<>();
     private final Random rand = new Random();
 
-    public MapWithJungle(int width, int height, double jungleRatio, int grassTilesStartNo, int animalsNo) {
-        this.bottomLeftMap = new Vector2d(0, 0);
-        this.topRightMap = new Vector2d(width - 1, height - 1);
+    public MapWithJungle(int width, int height, double jungleRatio) {
+        this.bottomLeft = new Vector2d(0, 0);
+        this.topRight = new Vector2d(width - 1, height - 1);
 
         int jungleWidth = (int) floor(width * jungleRatio);
         int jungleHeight = (int) floor(height * jungleRatio);
         this.bottomLeftJungle = new Vector2d( (width - jungleWidth)/2, (height - jungleHeight)/2);
         this.topRightJungle = new Vector2d( (width + jungleWidth)/2, (height + jungleHeight)/2);
-
         System.out.println(bottomLeftJungle);
         System.out.println(topRightJungle);
-
-        placeStartingAnimals(animalsNo);
-        for(int i = 0; i < floorDiv(grassTilesStartNo, 2); i++){
-            placeGrassInJungle();
-        }
-        for(int i = 0; i < ceil(grassTilesStartNo/2.0); i++){
-            placeGrassOutsideJungle();
-        }
     }
 
     public String toString() {
-        return mapVis.draw(bottomLeftMap, topRightMap);
+        return mapVis.draw(bottomLeft, topRight);
     }
 
     @Override
@@ -58,7 +49,7 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
 
     @Override
     public boolean canMoveTo(Vector2d position) {
-        return position.follows(bottomLeftMap) && position.precedes(topRightMap);
+        return position.follows(bottomLeft) && position.precedes(topRight);
     }
 
     @Override
@@ -89,13 +80,6 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         return position;
     }
 
-    public void placeStartingAnimals(int animalsNo){
-        for (int i = 0; i < animalsNo; i++){
-            Vector2d position = findFreeTile(bottomLeftMap,topRightMap);
-            place(new Animal(this, position));
-        }
-    }
-
     public void placeGrassInJungle(){
         Vector2d position;
         position = findFreeTile(bottomLeftJungle, topRightJungle);
@@ -105,7 +89,7 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
     public void placeGrassOutsideJungle(){
         Vector2d position;
         do {
-            position = findFreeTile(bottomLeftMap,topRightMap);
+            position = findFreeTile(bottomLeft, topRight);
         } while(isInJungle(position));
 
         grassTilesHM.put(position, new Grass(position));
@@ -127,17 +111,17 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         if (!canMoveTo(position)){
             int x = position.x;
             int y = position.y;
-            if (position.x > topRightMap.x){
-                x = bottomLeftMap.x;
+            if (position.x > topRight.x){
+                x = bottomLeft.x;
             }
-            else if (position.x < bottomLeftMap.x){
-                x = topRightMap.x;
+            else if (position.x < bottomLeft.x){
+                x = topRight.x;
             }
-            if (position.y > topRightMap.y){
-                y = bottomLeftMap.y;
+            if (position.y > topRight.y){
+                y = bottomLeft.y;
             }
-            else if (position.y < bottomLeftMap.y){
-                y = topRightMap.y;
+            else if (position.y < bottomLeft.y){
+                y = topRight.y;
             }
             position = new Vector2d(x,y);
         }
@@ -152,8 +136,12 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         return grassTilesHM;
     }
 
+    public Vector2d getBottomLeft(){
+        return this.bottomLeft;
+    }
 
-
-
+    public Vector2d getTopRight(){
+        return this.topRight;
+    }
 
 }
