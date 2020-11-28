@@ -1,19 +1,25 @@
 package agh.lab;
 
-import static agh.lab.SimulationEngine.startingEnergy;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StatsMaker {
-    public int animalsNo;
-    public int grassTilesNo;
-    public int totalEnergy;
-    public int totalDeadAnimalsNo;
-    public int totalDeadLifeSpan;
-    public int totalChildrenOfAlive;
+    private int animalsNo;
+    private int grassTilesNo;
+    private int totalEnergy;
+    private int totalDeadAnimalsNo;
+    private int totalDeadLifeSpan;
+    private int totalChildrenOfAlive;
+    private List<Integer> childrenNoOnNthDay = new ArrayList<>();
 
-    public StatsMaker(int startingAnimalsNo, int startingGrassTilesNo) {
+    public StatsMaker(int startingAnimalsNo, int startingGrassTilesNo, int startingEnergy) {
         this.animalsNo = startingAnimalsNo;
         this.grassTilesNo = startingGrassTilesNo;
         this.totalEnergy += startingAnimalsNo * startingEnergy;
+    }
+
+    public void dayPassed(){
+        this.childrenNoOnNthDay.add(totalChildrenOfAlive);
     }
 
     public void animalMoved(){
