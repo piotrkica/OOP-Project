@@ -4,66 +4,60 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StatsMaker {
-    private int animalsNo;
-    private int grassTilesNo;
+    private int animalsAliveCount;
+    private int grassTilesCount;
     private int totalEnergy;
-    private int totalDeadAnimalsNo;
+    private int deadAnimalsCount;
     private int totalDeadLifeSpan;
     private int totalChildrenOfAlive;
-    private List<Integer> childrenNoOnNthDay = new ArrayList<>();
-
-    public StatsMaker(int startingAnimalsNo, int startingGrassTilesNo, int startingEnergy) {
-        this.animalsNo = startingAnimalsNo;
-        this.grassTilesNo = startingGrassTilesNo;
-        this.totalEnergy += startingAnimalsNo * startingEnergy;
-    }
+    private List<Integer> childrenCountOnNthDay = new ArrayList<>();
 
     public void dayPassed(){
-        this.childrenNoOnNthDay.add(totalChildrenOfAlive);
+        this.childrenCountOnNthDay.add(totalChildrenOfAlive);
     }
 
-    public void animalMoved(){
-        this.totalEnergy--;
-    }
-
-    public void childWasBorn(){
-        this.totalChildrenOfAlive++;
+    public void animalMoved(int moveEnergyCost){
+        this.totalEnergy-=moveEnergyCost;
     }
 
     public void addAnimal(int energy) {
-        this.animalsNo++;
+        this.animalsAliveCount++;
         this.totalEnergy += energy;
     }
 
-    public void removeAnimal(int lifeSpan, int childrenNo) {
-        this.animalsNo--;
-        this.totalDeadAnimalsNo++;
+    public void removeAnimal(int lifeSpan, int childrenCount) {
+        this.animalsAliveCount--;
+        this.deadAnimalsCount++;
         this.totalDeadLifeSpan += lifeSpan;
-        this.totalChildrenOfAlive -= childrenNo;
+        this.totalChildrenOfAlive -= childrenCount;
     }
 
     public void addGrass() {
-        this.grassTilesNo++;
+        this.grassTilesCount++;
     }
 
     public void removeGrass() {
-        this.grassTilesNo--;
+        this.grassTilesCount--;
+    }
+
+    public void addEnergy(int addedEnergy){
+        this.totalEnergy+=addedEnergy;
     }
 
     public void addChild() {
-        totalChildrenOfAlive--;
+        totalChildrenOfAlive++;
     }
 
     public double getAvgEnergy(){
-        return 1.0*totalEnergy/animalsNo;
+        return 1.0*totalEnergy/ animalsAliveCount;
     }
 
     public double getAvgDeadLifeSpan(){
-        return 1.0*totalDeadLifeSpan/totalDeadAnimalsNo;
+        return 1.0*totalDeadLifeSpan/ deadAnimalsCount;
     }
 
-    public double getAvgChildrenNo(){
-        return 1.0*totalChildrenOfAlive/animalsNo;
+    public double getAvgChildrenCount(){
+        return 1.0*totalChildrenOfAlive/ animalsAliveCount;
     }
 
 }
