@@ -81,12 +81,18 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
     }
 
     public void placeGrassInJungle(){
+        if(!possibleFreeTileInJungle()){
+            return;
+        }
         Vector2d position;
         position = findFreeTile(bottomLeftJungle, topRightJungle);
         grassTilesHM.put(position, new Grass(position));
     }
 
     public void placeGrassOutsideJungle(){
+        if(!possibleFreeTileOutsideJungle()){
+            return;
+        }
         Vector2d position;
         do {
             position = findFreeTile(bottomLeft, topRight);
@@ -95,7 +101,32 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
         grassTilesHM.put(position, new Grass(position));
     }
 
-    public Vector2d findFreePositionForChild(Vector2d parentsPosition){ // na obecną chwile przeszukuje w promieniu 2 pól, może znaleźć miejsc po drugiej stronie mapy
+    public boolean possibleFreeTileInJungle(){
+        for (int x = bottomLeftJungle.x; x <= topRightJungle.x; x++){
+            for (int y = bottomLeftJungle.y; y <= topRightJungle.y; y++){
+                if (!isOccupied(new Vector2d(x,y))){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean possibleFreeTileOutsideJungle(){
+        for (int x = bottomLeft.x; x <= topRight.x; x++){
+            for (int y = bottomLeft.y; y <= topRight.y; y++){
+                if (isInJungle(new Vector2d(x,y))){
+                    continue;
+                }
+                if (!isOccupied(new Vector2d(x,y))){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Vector2d findFreePositionForChild(Vector2d parentsPosition){
         for(int i = -1; i < 1; i++){
             for(int j = -1; j < 1; j++){
                 Vector2d possiblePosition = repositionIfOutOfBounds(new Vector2d(i, j));
@@ -104,7 +135,7 @@ public class MapWithJungle implements IWorldMap, IPositionChangeObserver{
                 }
             }
         }
-        return new Vector2d(rand.nextInt(3)+parentsPosition.x - 1, rand.nextInt(3)+parentsPosition.y - 1);
+        return repositionIfOutOfBounds(new Vector2d(rand.nextInt(3)+parentsPosition.x - 1, rand.nextInt(3)+parentsPosition.y - 1));
     }
 
     public Vector2d repositionIfOutOfBounds(Vector2d position){
