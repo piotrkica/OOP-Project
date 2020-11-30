@@ -1,0 +1,10 @@
+{
+  "width": 5,
+  "height": 5,
+  "jungleRatio": 0.5,
+  "startingAnimals": 5,
+  "startingGrassTiles": 5,
+  "startingEnergy": 10,
+  "grassEnergyValue": 15,
+  "moveEnergyCost": 1
+}
