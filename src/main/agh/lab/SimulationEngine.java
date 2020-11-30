@@ -14,6 +14,7 @@ public class SimulationEngine implements IEngine {
     public int grassEnergyValue;
     public int moveEnergyCost;
     private final List<Animal> deadAnimals = new ArrayList<>();
+    private final StatsMaker statsMaker = new StatsMaker();
 
     public SimulationEngine(int width, int height, float jungleRatio, int startingAnimals, int startingGrassTiles, int startingEnergy, int grassEnergyValue, int moveEnergyCost) {
         this.map = new MapWithJungle(width, height, jungleRatio);
@@ -25,7 +26,7 @@ public class SimulationEngine implements IEngine {
     }
 
     public void run() {
-        for (int i = 0; i < 6;i++) {
+        for (int i = 0; i < 50;i++) {
             this.days++;
             System.out.println("Day: "+ this.days);
             System.out.println(map);
@@ -35,7 +36,6 @@ public class SimulationEngine implements IEngine {
             reproduceIfPossible();
             placeGrassInJungleAndOutside();
         }
-
         System.out.println(map);
     }
 
@@ -43,15 +43,18 @@ public class SimulationEngine implements IEngine {
         for (int i = 0; i < animalsNo; i++){
             Vector2d position = this.map.findFreeTile(this.map.getBottomLeft(),this.map.getTopRight());
             this.map.place(new Animal(this.map, position, startingEnergy));
+            this.statsMaker.addAnimal(startingEnergy);
         }
     }
 
     public void placeStartingGrass(int startingGrassTiles){
         for(int i = 0; i < startingGrassTiles/2; i++){
             this.map.placeGrassInJungle();
+            this.statsMaker.addGrass();
         }
         for(int i = 0; i < ceil(startingGrassTiles/2.0); i++){
             this.map.placeGrassOutsideJungle();
+            this.statsMaker.addGrass();
         }
     }
 
@@ -61,15 +64,16 @@ public class SimulationEngine implements IEngine {
         animals = animalCollection.toArray(animals);
         for (Animal animal : animals) {
             animal.move(moveEnergyCost);
-        }
-        for (Animal animal : animals) {
             System.out.println(animal.getEnergy());
+            this.statsMaker.animalMoved(moveEnergyCost);
         }
     }
 
     public void placeGrassInJungleAndOutside(){
         this.map.placeGrassInJungle();
+        this.statsMaker.addGrass();
         this.map.placeGrassOutsideJungle();
+        this.statsMaker.addGrass();
     }
 
     public List<Animal> getStrongestAnimals(Vector2d position){
@@ -99,7 +103,9 @@ public class SimulationEngine implements IEngine {
                 int grassEnergyValueSplit = grassEnergyValue/strongestAnimals.size();
                 for(Animal animal : strongestAnimals){
                     animal.addEnergy(grassEnergyValueSplit);
+                    this.statsMaker.addEnergy(grassEnergyValueSplit);
                 }
+                this.statsMaker.removeGrass();
             }
         }
     }
@@ -115,6 +121,7 @@ public class SimulationEngine implements IEngine {
                 deadAnimals.add(animal);
                 animal.removeAllObservers();
                 animalsMM.remove(animal.getPosition(), animal);
+                this.statsMaker.removeAnimal(animal.getLifeSpan(), animal.getChildrenCount());
             }
         }
     }
@@ -149,11 +156,13 @@ public class SimulationEngine implements IEngine {
                     }
                 }
                 if (strongest1.getEnergy() > startingEnergy/2 && strongest2.getEnergy() > startingEnergy/2){
-                    int childEnergy = strongest1.getEnergy()/2 + strongest2.getEnergy()/2;
-                    strongest1.setEnergy(strongest1.getEnergy()/2);
-                    strongest2.setEnergy(strongest2.getEnergy()/2);
+                    int childEnergy = strongest1.getEnergy()/4 + strongest2.getEnergy()/4;
+                    strongest1.setEnergy(strongest1.getEnergy()/4);
+                    strongest2.setEnergy(strongest2.getEnergy()/4);
                     strongest1.increaseChildrenCount();
                     map.place(new Animal(this.map, this.map.findFreePositionForChild(position), strongest1.getGenes(),strongest2.getGenes(), childEnergy));
+                    this.statsMaker.addAnimal(childEnergy);
+                    this.statsMaker.addChild();
                 }
             }
         }
