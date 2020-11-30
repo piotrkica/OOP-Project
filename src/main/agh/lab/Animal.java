@@ -2,13 +2,16 @@ package agh.lab;
 
 import java.util.*;
 
+import static agh.lab.MapDirection.MAP_DIRS_INDEXED;
+
 public class Animal implements IMapElement {
     private final MapWithJungle map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
-    private MapDirection orientation = MapDirection.NORTH;
+    private final Random rand = new Random();
+    private MapDirection orientation = MAP_DIRS_INDEXED[rand.nextInt(8)];
     private Vector2d position;
     private int energy;
-    private int daysAlive = 0;
+    private int lifeSpan = 0;
     private int childrenCount = 0;
     private final Genes genes;
 
@@ -60,7 +63,7 @@ public class Animal implements IMapElement {
     public void move(int moveEnergyCost) {
         Vector2d oldPosition = position;
         this.energy-= moveEnergyCost;
-        daysAlive++;
+        lifeSpan++;
         MapDirection direction = genes.chooseNextMove();
         Vector2d newPosition = this.position.add(direction.toUnitVector());
         this.position = this.map.repositionIfOutOfBounds(newPosition);
@@ -105,4 +108,11 @@ public class Animal implements IMapElement {
         return this.genes.getGenes();
     }
 
+    public int getLifeSpan(){
+        return this.lifeSpan;
+    }
+
+    public int getChildrenCount(){
+        return this.childrenCount;
+    }
 }
