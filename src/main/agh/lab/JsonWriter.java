@@ -21,6 +21,7 @@ public class JsonWriter {
         try {
             Files.write(statsObject.toJSONString().getBytes(), new File(path));
         } catch (IOException e) {
+            System.out.println(e);
             System.exit(-1);
         }
     }

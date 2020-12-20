@@ -111,10 +111,10 @@ public class GUI {
                     followedAnimal.setFollowing(false);
                 }
                 followedAnimal = simulationEngine.getStrongestAnimalAt(x, y);
-                updateAnimalStatsTextArea();
                 if(followedAnimal != null){
                     followedAnimal.setFollowing(true);
                 }
+                updateAnimalStatsTextArea();
                 if (x > mapWidth || y > mapHeight) {
                     throw new NumberFormatException();
                 }

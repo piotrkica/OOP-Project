@@ -18,6 +18,8 @@ public class Animal {
     private int dayOfDeath = -1;
     private int childrenSinceFollowing = 0;
     private int descendantsSinceFollowing = 0;
+    private int descendantsBeforeFollowing = 0;
+    private int daysFollowed = 0;
     private boolean beingFollowed = false;
 
     public Animal(MapWithJungle map, Vector2d initialPosition, int startingEnergy) {
@@ -126,12 +128,21 @@ public class Animal {
         return descendants;
     }
 
-    public void setFollowing(boolean value) {
-        if(!value){
+    public void setFollowing(boolean isFollowed) {
+        if(!isFollowed){
             this.childrenSinceFollowing = 0;
             this.descendantsSinceFollowing = 0;
+            this.descendantsBeforeFollowing = 0;
+            this.daysFollowed = 0;
         }
-        this.beingFollowed = value;
+        this.beingFollowed = isFollowed;
+        this.descendantsBeforeFollowing = this.getDescendantCount();
+    }
+
+    public int calculateDescendantsSinceFollowing(){
+        this.daysFollowed++;
+        int currentDescendants = this.getDescendantCount();
+        return currentDescendants - descendantsBeforeFollowing;
     }
 
     public String getStats() {
@@ -143,8 +154,11 @@ public class Animal {
         if (this.dayOfDeath != -1) {
             stats += "Died on day: " + this.dayOfDeath + "\n";
         }
+        stats += "\n";
+        stats += "Days followed:" + this.daysFollowed + "\n";
         stats += "Children since following: " + this.childrenSinceFollowing + "\n";
-        stats += "Descendants since following: " + this.descendantsSinceFollowing + "\n";
+
+        stats += "Descendants since following: " + this.calculateDescendantsSinceFollowing() + "\n";
         return stats;
     }
 }

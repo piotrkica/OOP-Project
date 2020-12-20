@@ -3,7 +3,7 @@ package agh.lab;
 import java.util.*;
 
 public class StatsMaker {
-    private int day = 1;
+    private int day = 0;
     private int aliveAnimalsCount = 0;
     private int grassTilesCount = 0;
     private int totalEnergy = 0;

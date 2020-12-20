@@ -2,6 +2,7 @@ package agh.lab;
 
 import com.google.common.collect.Multimap;
 
+import java.io.IOException;
 import java.util.*;
 
 import static java.lang.Math.ceil;
