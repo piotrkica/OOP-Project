@@ -54,50 +54,32 @@ public class GUI {
 
         this.startButton = new JButton("Start");
         this.startButton.setBounds(50, 25, 75, 25);
-        this.startButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                timer.start();
-            }
-        });
+        this.startButton.addActionListener(e -> timer.start());
         this.frame.add(startButton);
 
         this.pauseButton = new JButton("Stop");
         this.pauseButton.setBounds(150, 25, 75, 25);
-        this.pauseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                timer.stop();
-            }
-        });
+        this.pauseButton.addActionListener(e -> timer.stop());
         this.frame.add(pauseButton);
 
         this.restartButton = new JButton("Restart");
         this.restartButton.setBounds(250, 25, 100, 25);
-        this.restartButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                timer.stop();
-                simulationEngine = new SimulationEngine(parameters);
-                textAreaStatistics.setText(simulationEngine.getStats());
-                frame.add(textAreaStatistics);
-                textAreaSimulation.setText(simulationEngine.toString());
-                frame.add(textAreaSimulation);
-                textAreaAnimalStats.setText("");
-                frame.repaint();
+        this.restartButton.addActionListener(e -> {
+            timer.stop();
+            simulationEngine = new SimulationEngine(parameters);
+            textAreaStatistics.setText(simulationEngine.getStats());
+            frame.add(textAreaStatistics);
+            textAreaSimulation.setText(simulationEngine.toString());
+            frame.add(textAreaSimulation);
+            textAreaAnimalStats.setText("");
+            frame.repaint();
 
-            }
         });
         this.frame.add(restartButton);
 
         this.saveButton = new JButton("Save");
         this.saveButton.setBounds(375, 25, 75, 25);
-        this.saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                simulationEngine.writeStats(firstSimulation);
-            }
-        });
+        this.saveButton.addActionListener(e -> simulationEngine.writeStats(firstSimulation));
         this.frame.add(saveButton);
 
         this.textAreaStatistics = new JTextArea("");
@@ -121,28 +103,25 @@ public class GUI {
 
         this.animalStatsButton = new JButton("Follow animal");
         this.animalStatsButton.setBounds(300, 225, 150, 25);
-        this.animalStatsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int x = Integer.parseInt(textFieldCoordX.getText());
-                    int y = Integer.parseInt(textFieldCoordY.getText());
-                    if(followedAnimal != null){
-                        followedAnimal.setFollowing(false);
-                    }
-                    followedAnimal = simulationEngine.getStrongestAnimalAt(x, y);
-                    updateAnimalStatsTextArea();
-                    if(followedAnimal != null){
-                        followedAnimal.setFollowing(true);
-                    }
-                    if (x > mapWidth || y > mapHeight) {
-                        throw new NumberFormatException();
-                    }
-                } catch (NumberFormatException ex) {
-                    textAreaAnimalStats.setText("Couldn't parse that input.\nPlease write coordinates that are integer in bounds of map.");
-                    frame.add(textAreaAnimalStats);
-                    frame.repaint();
+        this.animalStatsButton.addActionListener(e -> {
+            try {
+                int x = Integer.parseInt(textFieldCoordX.getText());
+                int y = Integer.parseInt(textFieldCoordY.getText());
+                if(followedAnimal != null){
+                    followedAnimal.setFollowing(false);
                 }
+                followedAnimal = simulationEngine.getStrongestAnimalAt(x, y);
+                updateAnimalStatsTextArea();
+                if(followedAnimal != null){
+                    followedAnimal.setFollowing(true);
+                }
+                if (x > mapWidth || y > mapHeight) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException ex) {
+                textAreaAnimalStats.setText("Couldn't parse that input.\nPlease write coordinates that are integer in bounds of map.");
+                frame.add(textAreaAnimalStats);
+                frame.repaint();
             }
         });
         this.frame.add(animalStatsButton);
