@@ -2,7 +2,6 @@ package agh.lab;
 
 import com.google.common.collect.Multimap;
 
-import java.io.IOException;
 import java.util.*;
 
 import static java.lang.Math.ceil;
@@ -90,7 +89,7 @@ public class SimulationEngine {
         for (Vector2d grassPosition : grassTiles) {
             if (animalsMM.get(grassPosition).size() >= 1) {
                 grassTilesHM.remove(grassPosition);
-                List<Animal> strongestAnimals = this.map.getStrongestAnimals(grassPosition);
+                List<Animal> strongestAnimals = this.map.getStrongestAnimalsAt(grassPosition);
                 int grassEnergyValueSplit = grassEnergyValue / strongestAnimals.size();
                 for (Animal animal : strongestAnimals) {
                     animal.addEnergy(grassEnergyValueSplit);
@@ -157,7 +156,7 @@ public class SimulationEngine {
     }
 
     public Animal getStrongestAnimalAt(int x, int y) {
-        return this.map.getStrongestAnimalAt(new Vector2d(x, y));
+        return this.map.getOneStrongestAnimalAt(new Vector2d(x, y));
     }
 
     @Override

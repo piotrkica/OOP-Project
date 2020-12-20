@@ -54,7 +54,7 @@ public class MapWithJungle implements IPositionChangeObserver {
         return animalsMM.get(position);
     }
 
-    public Animal getStrongestAnimalAt(Vector2d position) {
+    public Animal getOneStrongestAnimalAt(Vector2d position) {
         if (animalsMM.get(position).size() == 0) {
             return null;
         }
@@ -87,7 +87,7 @@ public class MapWithJungle implements IPositionChangeObserver {
         return position;
     }
 
-    public List<Animal> getStrongestAnimals(Vector2d position) {
+    public List<Animal> getStrongestAnimalsAt(Vector2d position) {
         List<Animal> strongestAnimals = new LinkedList<>();
         int strongestEnergy = 0;
         for (Animal animal : animalsMM.get(position)) {
