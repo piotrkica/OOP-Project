@@ -126,8 +126,16 @@ public class Animal {
         return descendants;
     }
 
-    public void setFollowing() {
-        this.beingFollowed = true;
+    public void setFollowing(boolean value) {
+        if(!value){
+            this.childrenSinceFollowing = 0;
+            this.descendantsSinceFollowing = 0;
+        }
+        this.beingFollowed = value;
+    }
+
+    public boolean getFollowing(){
+        return this.beingFollowed;
     }
 
     public String getStats() {
@@ -139,8 +147,8 @@ public class Animal {
         if (this.dayOfDeath != -1) {
             stats += "Died on day: " + this.dayOfDeath + "\n";
         }
-        stats += "Children since following: " + this.childrenSinceFollowing;
-        stats += "Descendants since following: " + this.descendantsSinceFollowing;
+        stats += "Children since following: " + this.childrenSinceFollowing + "\n";
+        stats += "Descendants since following: " + this.descendantsSinceFollowing + "\n";
         return stats;
     }
 }

@@ -119,7 +119,7 @@ public class GUI {
         textAreaAnimalStats.setEditable(false);
         this.frame.add(textAreaAnimalStats);
 
-        this.animalStatsButton = new JButton("Get animal stats");
+        this.animalStatsButton = new JButton("Follow animal");
         this.animalStatsButton.setBounds(300, 225, 150, 25);
         this.animalStatsButton.addActionListener(new ActionListener() {
             @Override
@@ -127,11 +127,17 @@ public class GUI {
                 try {
                     int x = Integer.parseInt(textFieldCoordX.getText());
                     int y = Integer.parseInt(textFieldCoordY.getText());
+                    if(followedAnimal != null){
+                        followedAnimal.setFollowing(false);
+                    }
                     followedAnimal = simulationEngine.getStrongestAnimalAt(x, y);
+                    updateAnimalStatsTextArea();
+                    if(followedAnimal != null){
+                        followedAnimal.setFollowing(true);
+                    }
                     if (x > mapWidth || y > mapHeight) {
                         throw new NumberFormatException();
                     }
-                    updateAnimalStatsTextArea();
                 } catch (NumberFormatException ex) {
                     textAreaAnimalStats.setText("Couldn't parse that input.\nPlease write coordinates that are integer in bounds of map.");
                     frame.add(textAreaAnimalStats);
