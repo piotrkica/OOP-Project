@@ -4,16 +4,21 @@ import java.util.*;
 
 import static agh.lab.MapDirection.MAP_DIRS_INDEXED;
 
-public class Animal implements IMapElement {
+public class Animal {
     private final MapWithJungle map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
     private final Random rand = new Random();
-    private MapDirection orientation = MAP_DIRS_INDEXED[rand.nextInt(8)];
+    private final Genes genes;
+    private final List<Animal> children = new ArrayList<>();
+    private MapDirection direction = MAP_DIRS_INDEXED[rand.nextInt(8)];
     private Vector2d position;
     private int energy;
     private int lifeSpan = 0;
     private int childrenCount = 0;
-    private final Genes genes;
+    private int dayOfDeath = -1;
+    private int childrenSinceFollowing = 0;
+    private int descendantsSinceFollowing = 0;
+    private boolean beingFollowed = false;
 
     public Animal(MapWithJungle map, Vector2d initialPosition, int startingEnergy) {
         this.map = map;
@@ -22,7 +27,7 @@ public class Animal implements IMapElement {
         this.genes = new Genes();
     }
 
-    public Animal(MapWithJungle map, Vector2d initialPosition, List<Integer> strongerGenes, List<Integer> weakerGenes, int energy) {
+    public Animal(MapWithJungle map, Vector2d initialPosition, int[] strongerGenes, int[] weakerGenes, int energy) {
         this.map = map;
         this.position = initialPosition;
         this.genes = new Genes(strongerGenes, weakerGenes);
@@ -30,46 +35,21 @@ public class Animal implements IMapElement {
     }
 
     public String toString() {
-        switch (this.orientation) {
-            case NORTH:
-                return "N";
-            case NORTHEAST:
-                return "NE";
-            case EAST:
-                return "E";
-            case SOUTHEAST:
-                return "SE";
-            case SOUTH:
-                return "S";
-            case SOUTHWEST:
-                return "SW";
-            case WEST:
-                return "W";
-            case NORTHWEST:
-                return "NW";
-            default:
-                return null;
-        }
+        return "\ud83d\udc11";
     }
 
     public Vector2d getPosition() {
         return this.position;
     }
 
-    public MapDirection getOrientation() {
-        return this.orientation;
-    }
-
     public void move(int moveEnergyCost) {
         Vector2d oldPosition = position;
-        this.energy-= moveEnergyCost;
-        lifeSpan++;
-        MapDirection direction = genes.chooseNextMove();
+        this.energy -= moveEnergyCost;
+        this.lifeSpan++;
+        this.direction = genes.rotateAnimal(this.direction);
         Vector2d newPosition = this.position.add(direction.toUnitVector());
         this.position = this.map.repositionIfOutOfBounds(newPosition);
         positionChanged(oldPosition);
-        this.orientation = direction;
-
     }
 
     public void addObserver(IPositionChangeObserver observer) {
@@ -88,7 +68,7 @@ public class Animal implements IMapElement {
         }
     }
 
-    public int getEnergy(){
+    public int getEnergy() {
         return this.energy;
     }
 
@@ -96,23 +76,71 @@ public class Animal implements IMapElement {
         this.energy += grassEnergyValueSplit;
     }
 
-    public void setEnergy(int energy){
+    public void setEnergy(int energy) {
         this.energy = energy;
     }
 
-    public void increaseChildrenCount(){
+    public Animal reproduce(Animal other) {
+        int childEnergy = this.energy / 4 + other.energy / 4;
+        this.setEnergy(3 * this.energy / 4);
+        other.setEnergy(3 * other.energy / 4);
         this.childrenCount++;
+        other.childrenCount++;
+        Animal newBorn = new Animal(this.map, this.map.findFreePositionForChild(position), this.getGenesArray(), other.getGenesArray(), childEnergy);
+        this.children.add(newBorn);
+        other.children.add(newBorn);
+        if (this.beingFollowed) {
+            childrenSinceFollowing++;
+        }
+        if (other.beingFollowed) {
+            other.childrenSinceFollowing++;
+        }
+        return newBorn;
     }
 
-    public List<Integer> getGenes(){
-        return this.genes.getGenes();
+    public Genes getGenes() {
+        return this.genes;
     }
 
-    public int getLifeSpan(){
+    public int[] getGenesArray() {
+        return this.genes.getGenesArray();
+    }
+
+    public int getLifeSpan() {
         return this.lifeSpan;
     }
 
-    public int getChildrenCount(){
+    public int getChildrenCount() {
         return this.childrenCount;
+    }
+
+    public void setDayOfDeath(int dayOfDeath) {
+        this.dayOfDeath = dayOfDeath;
+    }
+
+    public int getDescendantCount() {
+        int descendants = 0;
+        for (Animal child : children) {
+            descendants += child.getDescendantCount() + 1;
+        }
+        return descendants;
+    }
+
+    public void setFollowing() {
+        this.beingFollowed = true;
+    }
+
+    public String getStats() {
+        String stats = "";
+        stats += "Energy: " + this.energy + "\n";
+        stats += "Genotype: " + this.genes.toString() + "\n";
+        stats += "Number of children: " + this.childrenCount + "\n";
+        stats += "Number of descendants: " + this.getDescendantCount() + "\n";
+        if (this.dayOfDeath != -1) {
+            stats += "Died on day: " + this.dayOfDeath + "\n";
+        }
+        stats += "Children since following: " + this.childrenSinceFollowing;
+        stats += "Descendants since following: " + this.descendantsSinceFollowing;
+        return stats;
     }
 }
