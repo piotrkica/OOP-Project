@@ -9,6 +9,7 @@ import java.io.IOException;
 public class JsonWriter {
     public static void writeJson(StatsMaker stats, String filename) {
         JSONObject statsObject = new JSONObject();
+        statsObject.put("finalDay", stats.getDay());
         statsObject.put("avgAliveAnimalsCount", stats.getAvgAliveAnimalsCountOverTime());
         statsObject.put("avgGrassTilesCount", stats.getAvgGrassTilesCountOverTime());
         statsObject.put("avgDominantGenotype", stats.getDominantGeneOverTime());
