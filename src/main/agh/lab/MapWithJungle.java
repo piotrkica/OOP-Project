@@ -35,13 +35,12 @@ public class MapWithJungle implements IPositionChangeObserver {
         return this.objectAt(position) != null;
     }
 
-    public boolean place(Animal animal) {
+    public void place(Animal animal) {
         if (!canMoveTo(animal.getPosition())) {
             throw new IllegalArgumentException(animal.getPosition() + " field is out of bounds");
         }
         animalsMM.put(animal.getPosition(), animal);
         animal.addObserver(this);
-        return true;
     }
 
     public boolean canMoveTo(Vector2d position) {

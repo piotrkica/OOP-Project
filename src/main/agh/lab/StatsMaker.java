@@ -85,14 +85,6 @@ public class StatsMaker {
         return this.day;
     }
 
-    public int getAliveAnimalsCount() {
-        return this.aliveAnimalsCount;
-    }
-
-    public int getGrassTilesCount() {
-        return this.grassTilesCount;
-    }
-
     public Genes getDominantGene() {
         Iterator genes = genesCounter.keySet().iterator();
         if (!genes.hasNext()) {

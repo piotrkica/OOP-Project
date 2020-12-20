@@ -14,7 +14,7 @@ public class MapVisualizer {
     private static final String EMPTY_CELL = "    ";
     private static final String FRAME_SEGMENT = "-";
     private static final String CELL_SEGMENT = "|";
-    private MapWithJungle map;
+    private final MapWithJungle map;
 
     /**
      * Initializes the MapVisualizer with an instance of map to visualize.

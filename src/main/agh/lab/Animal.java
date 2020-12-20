@@ -47,7 +47,7 @@ public class Animal {
         this.energy -= moveEnergyCost;
         this.lifeSpan++;
         this.direction = genes.rotateAnimal(this.direction);
-        Vector2d newPosition = this.position.add(direction.toUnitVector());
+        Vector2d newPosition = this.position.add(Objects.requireNonNull(direction.toUnitVector()));
         this.position = this.map.repositionIfOutOfBounds(newPosition);
         positionChanged(oldPosition);
     }
