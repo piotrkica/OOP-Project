@@ -134,10 +134,6 @@ public class Animal {
         this.beingFollowed = value;
     }
 
-    public boolean getFollowing(){
-        return this.beingFollowed;
-    }
-
     public String getStats() {
         String stats = "";
         stats += "Energy: " + this.energy + "\n";
