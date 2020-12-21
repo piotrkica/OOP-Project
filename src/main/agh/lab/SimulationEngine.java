@@ -123,7 +123,7 @@ public class SimulationEngine {
         Vector2d[] animalPositions = animalsMM.keySet().toArray(new Vector2d[0]);
         List<Animal> animalsBorn = new ArrayList<>();
         for (Vector2d position : animalPositions) {
-            if (animalsMM.get(position).size() >= 2) { // sort
+            if (animalsMM.get(position).size() >= 2) {
                 Animal strongest1 = null;
                 Animal strongest2 = null;
                 for (Animal animal : animalsMM.get(position)) {
