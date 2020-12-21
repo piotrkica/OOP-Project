@@ -72,6 +72,7 @@ public class GUI {
             textAreaSimulation.setText(simulationEngine.toString());
             frame.add(textAreaSimulation);
             textAreaAnimalStats.setText("");
+            followedAnimal = null;
             frame.repaint();
 
         });
