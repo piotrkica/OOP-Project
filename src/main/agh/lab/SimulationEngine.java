@@ -31,7 +31,7 @@ public class SimulationEngine {
         this.statsMaker.dayPassed();
     }
 
-    public void placeStartingAnimals(int animalsNo) {
+    private void placeStartingAnimals(int animalsNo) {
         for (int i = 0; i < animalsNo; i++) {
             if (this.map.notPossibleFreeTileInJungle() && this.map.notPossibleFreeTileOutsideJungle()) {
                 break;
@@ -43,7 +43,7 @@ public class SimulationEngine {
         }
     }
 
-    public void placeStartingGrass(int startingGrassTiles) {
+    private void placeStartingGrass(int startingGrassTiles) {
         for (int i = 0; i < startingGrassTiles / 2; i++) {
             if (this.map.notPossibleFreeTileInJungle()) {
                 break;
@@ -62,7 +62,7 @@ public class SimulationEngine {
         }
     }
 
-    public void moveAnimals() {
+    private void moveAnimals() {
         Collection<Animal> animalCollection = map.getAnimalsMM().values();
         Animal[] animals = new Animal[animalCollection.size()];
         animals = animalCollection.toArray(animals);
@@ -72,7 +72,7 @@ public class SimulationEngine {
         }
     }
 
-    public void placeGrassInJungleAndOutside() {
+    private void placeGrassInJungleAndOutside() {
         if (this.map.placeGrassInJungle()) {
             this.statsMaker.addGrass();
         }
@@ -81,7 +81,7 @@ public class SimulationEngine {
         }
     }
 
-    public void eatGrass() {
+    private void eatGrass() {
         Multimap<Vector2d, Animal> animalsMM = map.getAnimalsMM();
         Map<Vector2d, Grass> grassTilesHM = map.getGrassTilesHM();
         Vector2d[] grassTiles = grassTilesHM.keySet().toArray(new Vector2d[0]);
@@ -100,7 +100,7 @@ public class SimulationEngine {
         }
     }
 
-    public void removeDeadAnimals() {
+    private void removeDeadAnimals() {
         Multimap<Vector2d, Animal> animalsMM = map.getAnimalsMM();
         Collection<Animal> animalCollection = animalsMM.values();
         Animal[] animals = new Animal[animalCollection.size()];
@@ -117,7 +117,7 @@ public class SimulationEngine {
         }
     }
 
-    public void reproduceIfPossible() {
+    private void reproduceIfPossible() {
         Multimap<Vector2d, Animal> animalsMM = map.getAnimalsMM();
 
         Vector2d[] animalPositions = animalsMM.keySet().toArray(new Vector2d[0]);

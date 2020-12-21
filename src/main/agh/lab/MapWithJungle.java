@@ -74,7 +74,7 @@ public class MapWithJungle implements IPositionChangeObserver {
 
     }
 
-    public boolean isAJungleTile(Vector2d position) {
+    private boolean isAJungleTile(Vector2d position) {
         return position.follows(bottomLeftJungle) && position.precedes(topRightJungle);
     }
 

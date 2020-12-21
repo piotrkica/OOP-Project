@@ -38,7 +38,7 @@ public class GUI {
         simulationGUI();
     }
 
-    public void simulationGUI() {
+    private void simulationGUI() {
         this.frame = new JFrame("Evolution Simulator");
         int frameWidth = Math.max(mapWidth * 21, 575);
         int frameHeight = Math.max(mapHeight * 25 + 350, 915);
@@ -137,7 +137,7 @@ public class GUI {
         timer = new Timer(150, timerListener);
     }
 
-    public ActionListener timerListener = new ActionListener() {
+    private final ActionListener timerListener = new ActionListener() {
         public void actionPerformed(ActionEvent event) {
             simulationEngine.dayPassed();
             textAreaStatistics.setText(simulationEngine.getStats());
@@ -161,7 +161,7 @@ public class GUI {
         frame.repaint();
     }
 
-    static Rectangle getMaxWindowBounds(JFrame frame) {
+    private Rectangle getMaxWindowBounds(JFrame frame) {
         GraphicsConfiguration config = frame.getGraphicsConfiguration();
         Rectangle bounds = config.getBounds();
         Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(config);
@@ -172,11 +172,11 @@ public class GUI {
         return bounds;
     }
 
-    static void setLocationToLeft(JFrame frame) {
+    private void setLocationToLeft(JFrame frame) {
         frame.setLocation(getMaxWindowBounds(frame).x, frame.getY());
     }
 
-    static void setLocationNextTo(JFrame frame, int width) {
+    private void setLocationNextTo(JFrame frame, int width) {
         frame.setLocation(frame.getX() + width, getMaxWindowBounds(frame).y);
     }
 

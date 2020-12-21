@@ -17,7 +17,6 @@ public class Animal {
     private int childrenCount = 0;
     private int dayOfDeath = -1;
     private int childrenSinceFollowing = 0;
-    private int descendantsSinceFollowing = 0;
     private int descendantsBeforeFollowing = 0;
     private int daysFollowed = 0;
     private boolean beingFollowed = false;
@@ -64,7 +63,7 @@ public class Animal {
         }
     }
 
-    public void positionChanged(Vector2d oldPosition) {
+    private void positionChanged(Vector2d oldPosition) {
         for (IPositionChangeObserver observer : observers) {
             observer.positionChanged(this, oldPosition);
         }
@@ -131,7 +130,6 @@ public class Animal {
     public void setFollowing(boolean isFollowed) {
         if(!isFollowed){
             this.childrenSinceFollowing = 0;
-            this.descendantsSinceFollowing = 0;
             this.descendantsBeforeFollowing = 0;
             this.daysFollowed = 0;
         }
@@ -139,7 +137,7 @@ public class Animal {
         this.descendantsBeforeFollowing = this.getDescendantCount();
     }
 
-    public int calculateDescendantsSinceFollowing(){
+    private int calculateDescendantsSinceFollowing(){
         this.daysFollowed++;
         int currentDescendants = this.getDescendantCount();
         return currentDescendants - descendantsBeforeFollowing;
