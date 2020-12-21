@@ -20,6 +20,7 @@ public class Animal {
     private int descendantsBeforeFollowing = 0;
     private int daysFollowed = 0;
     private boolean beingFollowed = false;
+    private boolean alreadyCountedToDescendants = false;
 
     public Animal(MapWithJungle map, Vector2d initialPosition, int startingEnergy) {
         this.map = map;
@@ -122,7 +123,13 @@ public class Animal {
     public int getDescendantCount() {
         int descendants = 0;
         for (Animal child : children) {
-            descendants += child.getDescendantCount() + 1;
+            if(!child.alreadyCountedToDescendants){
+                child.alreadyCountedToDescendants = true;
+                descendants += child.getDescendantCount() + 1;
+            }
+        }
+        for(Animal child : children){
+            child.alreadyCountedToDescendants = false;
         }
         return descendants;
     }
