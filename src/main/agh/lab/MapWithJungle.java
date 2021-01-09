@@ -43,7 +43,7 @@ public class MapWithJungle implements IPositionChangeObserver {
         animal.addObserver(this);
     }
 
-    public boolean canMoveTo(Vector2d position) {
+    public boolean canMoveTo(Vector2d position) {   // myląca nazwa + właściwie mogłoby być private
         return position.follows(bottomLeft) && position.precedes(topRight);
     }
 
@@ -167,7 +167,7 @@ public class MapWithJungle implements IPositionChangeObserver {
             int x = position.x;
             int y = position.y;
             if (position.x >= topRight.x) {
-                x = bottomLeft.x;
+                x = bottomLeft.x;   // przy założeniu, że nie można się ruszać o więcej niż 1
             } else if (position.x < bottomLeft.x) {
                 x = topRight.x;
             }
@@ -182,7 +182,7 @@ public class MapWithJungle implements IPositionChangeObserver {
     }
 
     public Multimap<Vector2d, Animal> getAnimalsMM() {
-        return this.animalsMM;
+        return this.animalsMM;  // naruszenie hermetyzacji
     }
 
     public Map<Vector2d, Grass> getGrassTilesHM() {

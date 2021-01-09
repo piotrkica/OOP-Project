@@ -78,7 +78,7 @@ public class Animal {
         this.energy += grassEnergyValueSplit;
     }
 
-    public void setEnergy(int energy) {
+    public void setEnergy(int energy) { // czy set jest potrzebne, skoro jest add?
         this.energy = energy;
     }
 
@@ -134,7 +134,7 @@ public class Animal {
         return descendants;
     }
 
-    public void setFollowing(boolean isFollowed) {
+    public void setFollowing(boolean isFollowed) {  // czy to na pewno zadanie dla zwierzęcia?
         if(!isFollowed){
             this.childrenSinceFollowing = 0;
             this.descendantsBeforeFollowing = 0;
@@ -150,7 +150,7 @@ public class Animal {
         return currentDescendants - descendantsBeforeFollowing;
     }
 
-    public String getStats() {
+    public String getStats() {  // czy to na pewno zadanie dla zwierzęcia?
         String stats = "";
         stats += "Energy: " + this.energy + "\n";
         stats += "Genotype: " + this.genes.toString() + "\n";

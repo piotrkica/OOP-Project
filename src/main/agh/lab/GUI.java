@@ -1,4 +1,4 @@
-package agh.lab;
+package agh.lab;    // przydałby się podział na pakiety
 
 import javax.swing.*;
 import java.awt.*;

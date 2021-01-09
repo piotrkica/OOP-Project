@@ -72,7 +72,7 @@ public class SimulationEngine {
         }
     }
 
-    private void placeGrassInJungleAndOutside() {
+    private void placeGrassInJungleAndOutside() {   // wystarczyłoby samo placeGrass
         if (this.map.placeGrassInJungle()) {
             this.statsMaker.addGrass();
         }
@@ -126,7 +126,7 @@ public class SimulationEngine {
             if (animalsMM.get(position).size() >= 2) {
                 Animal strongest1 = null;
                 Animal strongest2 = null;
-                for (Animal animal : animalsMM.get(position)) {
+                for (Animal animal : animalsMM.get(position)) { // nie łatwiej by to było zrobić, jakby lista była posortowana?
                     if (strongest1 == null) {
                         strongest1 = animal;
                     } else if (strongest2 == null) {
@@ -142,7 +142,7 @@ public class SimulationEngine {
                     } else if (strongest2.getEnergy() < animal.getEnergy()) {
                         strongest2 = animal;
                     }
-                }
+                }   // a co z losowaniem w przypadku remisu?
                 if (strongest1.getEnergy() > startingEnergy / 2 && strongest2.getEnergy() > startingEnergy / 2) {
                     Animal newBorn = strongest1.reproduce(strongest2);
                     animalsBorn.add(newBorn);
@@ -164,7 +164,7 @@ public class SimulationEngine {
         return this.map.toString();
     }
 
-    public void writeStats(boolean firstSimulation) {
+    public void writeStats(boolean firstSimulation) {   // czy to na pewno zadanie dla silnika?
         if (firstSimulation) {
             JsonWriter.writeJson(this.statsMaker, "simulationStats");
         } else {
